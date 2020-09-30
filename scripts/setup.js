@@ -1,16 +1,18 @@
 'use strict';
 
 const db = require('@arangodb').db;
-const cnames = require('./collections')
+const cnames = require('./collections');
 
 for (const name of cnames.documentCollections) {
-  if (!db._collection(name)) {
-    db._createDocumentCollection(name);
+  const ctxName = module.context.collectionName(name);
+  if (!db._collection(ctxName)) {
+    db._createDocumentCollection(ctxName);
   }
 }
 
 for (const name of cnames.edgeCollections) {
-  if (!db._collection(name)) {
-    db._createEdgeCollection(name);
+  const ctxName = module.context.collectionName(name);
+  if (!db._collection(ctxName)) {
+    db._createEdgeCollection(ctxName);
   }
 }

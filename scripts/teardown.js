@@ -4,13 +4,14 @@ const db = require('@arangodb').db;
 const cnames = require('./collections')
 
 for (const name of cnames.documentCollections) {
-  if (db._collection(name)) {
-    db._drop(name);
+  const ctxName = module.context.collectionName(name);
+  if (db._collection(ctxName)) {
+    db._drop(ctxName);
   }
 }
 
 for (const name of cnames.edgeCollections) {
-  if (!db._collection(name)) {
-    db._drop(name);
+  if (!db._collection(ctxName)) {
+    db._drop(ctxName);
   }
 }

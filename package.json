@@ -1,0 +1,13 @@
+{
+  "name": "arangodb-svcs",
+  "version": "0.0.1",
+  "private": false,
+  "author": "The Alpheios Project, Ltd.",
+  "license": "ISC",
+  "devDependencies": {
+    "foxx-cli": ""
+  },
+  "dependencies": {
+    "graphql-sync": ""
+  }
+}
