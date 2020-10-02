@@ -1,34 +1,14 @@
-'use strict'
+'use strict';
+const schema = require('./schema');
+const gql = require('graphql-sync');
+const graphql = gql.graphql;
+const formatError = gql.formatError;
+const createGraphqlRouter = require('@arangodb/foxx/graphql');
 
-const joi = require('joi');
-
-
-const createRouter = require('@arangodb/foxx/router');
-const router = createRouter();
+// This is a regular Foxx router.
+const router = createGraphqlRouter({schema, graphiql: true})
+.summary('GraphQL endpoint')
+.description('GraphQL endpoint for Alpheios word data.');
 
 module.context.use(router);
-
-router.get('/annotations/:name', function (req, res) {
-  res.send(`Hello ${req.pathParams.name}`);
-})
-.response(['text/plain'], 'A personalized greeting.')
-.summary('Personalized greeting')
-.description('Prints a personal greeting');
-
-router.post('/sum', function (req, res) {
-  const values = req.body.values;
-  res.send({
-    result: values.reduce(function (a,b) {
-      return a+b;
-    }, 0)
-  });
-})
-.body(joi.object({
-  values: joi.array().items(joi.number().required()).required()
-}).required(), 'Values to add together.')
-.response(joi.object({
-  result: joi.number().required()
-}).required(), 'Sum of the input values.')
-.summary('Add up numbers')
-.description('Calculates the sum of an array');
 

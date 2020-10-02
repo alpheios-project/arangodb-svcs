@@ -8,6 +8,7 @@
     "foxx-cli": ""
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "graphql-sync": ""
   }
 }
