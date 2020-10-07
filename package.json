@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "chai": "^4.2.0",
-    "graphql-sync": ""
+    "graphql": "^0.12"
   }
 }

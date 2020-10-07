@@ -1,14 +1,14 @@
 'use strict';
-const schema = require('./schema');
-const gql = require('graphql-sync');
-const graphql = gql.graphql;
-const formatError = gql.formatError;
 const createGraphqlRouter = require('@arangodb/foxx/graphql');
+const graphql = require('graphql-sync');
+const schema = require('./graphql/rootSchema');
 
-// This is a regular Foxx router.
-const router = createGraphqlRouter({schema, graphiql: true})
-.summary('GraphQL endpoint')
+const router = createGraphqlRouter({
+      schema: schema,
+      graphiql: true,
+      graphql: graphql,
+}).summary('GraphQL endpoint')
 .description('GraphQL endpoint for Alpheios word data.');
+module.context.use("/graphql", router);
 
-module.context.use(router);
 
