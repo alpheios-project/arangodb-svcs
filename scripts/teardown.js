@@ -11,7 +11,8 @@ for (const name of cnames.documentCollections) {
 }
 
 for (const name of cnames.edgeCollections) {
-  if (!db._collection(ctxName)) {
+  const ctxName = module.context.collectionName(name);
+  if (db._collection(ctxName)) {
     db._drop(ctxName);
   }
 }

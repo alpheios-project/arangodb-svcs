@@ -9,7 +9,7 @@ const lemmaVariantInputType = new gql.GraphQLInputObjectType({
       lemma: {
         type: new gql.GraphQLNonNull(lemmaInputType)
       },
-      variantOf: {
+      variantLemma: {
         type: new gql.GraphQLNonNull(lemmaInputType)
       },
       preferred: {
@@ -31,13 +31,21 @@ const lemmaInputType = new gql.GraphQLInputObjectType({
         type: gql.GraphQLString,
         description: 'The id of the lemma.'
       },
-      form: {
+      representation: {
         type: gql.GraphQLString,
-        description: 'The written form of the lemma.'
+        description: 'Canonical written representation of the lemma.'
       },
       pos: {
         type: gql.GraphQLString,
-        description: 'The POS of the lemma'
+        description: 'The part of speech of the lemma'
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the lemma'
+      },
+      authority: {
+        type: gql.GraphQLString,
+        description: 'The authority which identified the lemma'
       }
     };
   }

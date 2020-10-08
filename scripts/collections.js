@@ -25,7 +25,24 @@ const edgeCollections = [
   'attestedAt'
 ];
 
+const fixturesNodes = {
+  lemmas: [
+    { _key: 'whitlatafore', lang: 'lat', representation: 'afore', authority: 'net.alpheios:tools:wordsxml.v1', pos: 'verb' },
+    { _key: 'whitlatabsum', lang: 'lat', representation: 'absum', authority: 'net.alpheios:tools:wordsxml.v1', pos: 'verb' }
+  ]
+};
+
+const fixturesEdges = {
+  isLemmaVariant: [
+    { _from: 'CTX_lemmas/whitlatafore', _to: 'CTX_lemmas/whitlatabsum', authority: 'net.alpheios' }
+  ]
+};
+
+
+
 module.exports = {
   documentCollections: documentCollections,
-  edgeCollections: edgeCollections
+  edgeCollections: edgeCollections,
+  fixturesNodes: fixturesNodes,
+  fixturesEdges: fixturesEdges
 }

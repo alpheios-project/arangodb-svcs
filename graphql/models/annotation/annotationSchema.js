@@ -7,38 +7,23 @@ const assertionType = new gql.GraphQLObjectType({
     return {
       id: {
         type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the assertion',
-        resolve(id) {
-          return 'http://any/assertion';
-        }
+        description: 'The id of the assertion'
       },
       subject: {
         type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
-        description: 'The subject of the assertion',
-        resolve() {
-          return 'subject';
-        }
+        description: 'The subject of the assertion'
       },
       predicate: {
         type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
-        description: 'The assertion predicate',
-        resolve() {
-          return 'predicate';
-        }
+        description: 'The assertion predicate'
       },
       object: {
         type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
-        description: 'The object of the assertion',
-        resolve() {
-          return 'object';
-        }
+        description: 'The object of the assertion'
       },
       authority: {
         type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
-        description: 'The authority',
-        resolve() {
-          return 'authority';
-        }
+        description: 'The authority'
       }
     }
   }
@@ -51,31 +36,15 @@ const annotationType = new gql.GraphQLObjectType({
     return {
       id: {
         type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the annotation.',
-        resolve(id) {
-          return "http://any/annotation";
-        }
+        description: 'The id of the annotation.'
       },
       lexemeId: {
         type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the lexeme.',
-        resolve(id) {
-          return "http://any/lexeme";
-        }
+        description: 'The id of the lexeme.'
       },
       assertions: {
        type: new gql.GraphQLNonNull(new gql.GraphQLList(assertionType)),
-       description: 'Assertions',
-       resolve() {
-         return [
-           {
-             id: 'http://any',
-             subject: 'afore',
-             predicate: 'hasPreferredLemmaVariant',
-             object: 'absum'
-            }
-          ]
-        }
+       description: 'Assertions'
       }
     }
   }

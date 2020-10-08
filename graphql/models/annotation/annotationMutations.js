@@ -1,28 +1,36 @@
 const gql = require('graphql-sync');
 const annotationSchema = require('./annotationSchema');
 const lexicalSchema = require('../lexical/lexicalSchema');
+const query = require('../../../queries/query');
 module.exports = {
 
   createLemmaVariant: {
     type: annotationSchema.AnnotationType,
     description: 'Create  a lemma variant annotation',
     args: {
-      lemmaVariant: {
+      input: {
         type: new gql.GraphQLNonNull(lexicalSchema.LemmaVariantInputType)
       },
     },
-    resolve(value, {lemmaVariant}) {
-      return {
-        id: 'http://id/annotation',
-        lexemeId: 'http://id/lexeme',
-        assertions: [
-          {
-            id: 'http://any',
-            subject: 'afore',
-            predicate: 'hasPreferredLemmaVariant',
-            object: 'absum'
-          }
-        ]
+    resolve(value, {input}) {
+      const variantExists = query.findLemmaVariant(input.lemma,input.variantLemma);
+      if (variantExists.length > 0) {
+        return {
+          id: 'http://id/annotation',
+          lexemeId: 'http://id/lexeme',
+          assertions: [
+            {
+              id: variantExists[0]._id,
+              subject: variantExists[0]._from,
+              predicate: 'isLemmaVariant',
+              object: variantExists[0]._to
+            }
+          ]
+        }
+      } else {
+        throw new gql.GraphQLError({
+          message: `The variant does not currently exist`
+        });
       }
     }
   }
