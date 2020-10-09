@@ -1,49 +1,42 @@
 const gql = require('graphql-sync');
+const lexicalSchema = require('../lexical/lexicalSchema');
 
 const assertionType = new gql.GraphQLObjectType({
   name: 'Assertion',
   description: 'An assertion',
   fields() {
     return {
-      id: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the assertion'
-      },
       subject: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
+        type: lexicalSchema.LexicalObjectInterface,
         description: 'The subject of the assertion'
       },
       predicate: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
+        type: gql.GraphQLString,
         description: 'The assertion predicate'
       },
       object: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
+        type: lexicalSchema.LexicalObjectOutputType,
         description: 'The object of the assertion'
       },
-      authority: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString)  ,
-        description: 'The authority'
+      authorities: {
+        type: new gql.GraphQLList(gql.GraphQLString),
+        description: 'Authorities for this assertion'
       }
     }
   }
 });
 
-const annotationType = new gql.GraphQLObjectType({
-  name: 'Annotation',
-  description: 'An annotation.',
+const annotationSetType = new gql.GraphQLObjectType({
+  name: 'AnnotationSet',
+  description: 'A set of annotations',
   fields() {
     return {
-      id: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the annotation.'
-      },
-      lexemeId: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'The id of the lexeme.'
+      target: {
+        type: lexicalSchema.LexicalObjectInterface,
+        description: 'The target of the assertions',
       },
       assertions: {
-       type: new gql.GraphQLNonNull(new gql.GraphQLList(assertionType)),
+       type: new gql.GraphQLList(assertionType),
        description: 'Assertions'
       }
     }
@@ -51,6 +44,6 @@ const annotationType = new gql.GraphQLObjectType({
 });
 
 module.exports = {
-  AnnotationType: annotationType,
+  AnnotationSetType: annotationSetType,
   AssertionType: assertionType
 };

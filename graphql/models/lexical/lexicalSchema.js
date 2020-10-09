@@ -1,6 +1,50 @@
 'use strict';
 const gql = require('graphql-sync');
 
+let lemmaInputType, inflectionInputType, lexemeInputType, lemmaOutputType, lexemeOutputType;
+
+const lexicalObjectInterface = new gql.GraphQLInterfaceType({
+  name: "LexicalObjectInterface",
+  description: "a generic lexical object",
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: "an IRI for this Object"
+      }
+    }
+  },
+  resolveType(obj) {
+    if (obj._id) {
+      if (obj._id.match(/lemmas\//)) {
+        return lemmaOutputType;
+      }
+    } else if (obj.lemma) {
+      return lexemeOutputType;
+    } else {
+      return lemmaOutputType;
+    }
+  }
+});
+
+const preferVariantEnum = new gql.GraphQLEnumType({
+  name: 'preferVariant',
+  description: 'Which to prefer of a variant - the target or variant or neither',
+  values: {
+    TARGET: {
+      value: 'target',
+      description: 'The target of the isLemmaVariant relationship'
+    },
+    VARIANT: {
+      value: 'variant',
+      description: 'The variant in the isLemmaVariant relationship'
+    },
+    NEITHER: {
+      value: 'neither',
+      description: 'Neither is preferred'
+    }
+  }
+});
 const lemmaVariantInputType = new gql.GraphQLInputObjectType({
   name: 'LemmaVariant',
   descript: 'A variant lemma',
@@ -12,19 +56,34 @@ const lemmaVariantInputType = new gql.GraphQLInputObjectType({
       variantLemma: {
         type: new gql.GraphQLNonNull(lemmaInputType)
       },
-      preferred: {
-        type: new gql.GraphQLNonNull(gql.GraphQLBoolean)
+      prefer: {
+        type: new gql.GraphQLNonNull(preferVariantEnum),
+        description: 'Which to prefer -- target or variant or neither'
       },
-      authority: {
+      source: {
         type: new gql.GraphQLNonNull(gql.GraphQLString)
       }
     }
   }
 });
 
-const lemmaInputType = new gql.GraphQLInputObjectType({
-  name: 'Lemma',
-  description: 'A lemma.',
+const lexicalObjectOutputType = new gql.GraphQLObjectType({
+  name: 'LexicalObject',
+  description: 'A generic lexical object',
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: 'The IRI of the object'
+      }
+    }
+  },
+  interfaces: [lexicalObjectInterface]
+});
+
+lemmaInputType = new gql.GraphQLInputObjectType({
+  name: 'LemmaInput',
+  description: 'A lemma passed in input.',
   fields() {
     return {
       id: {
@@ -43,15 +102,53 @@ const lemmaInputType = new gql.GraphQLInputObjectType({
         type: gql.GraphQLString,
         description: 'The language of the lemma'
       },
-      authority: {
+      principalParts: {
+        type: new gql.GraphQLList(gql.GraphQLString),
+        description: 'Principal parts of the lemma'
+      },
+      source: {
         type: gql.GraphQLString,
-        description: 'The authority which identified the lemma'
+        description: 'The source which identified the lemma'
       }
     };
   }
 });
 
-const inflectionInputType = new gql.GraphQLInputObjectType({
+lemmaOutputType = new gql.GraphQLObjectType({
+  name: 'Lemma',
+  description: 'A lemma.',
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: 'The IRI of the lemma.'
+      },
+      representation: {
+        type: gql.GraphQLString,
+        description: 'Canonical written representation of the lemma.'
+      },
+      pos: {
+        type: gql.GraphQLString,
+        description: 'The part of speech of the lemma'
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the lemma'
+      },
+      principalParts: {
+        type: new gql.GraphQLList(gql.GraphQLString),
+        description: 'Principal parts of the lemma'
+      },
+      source: {
+        type: gql.GraphQLString,
+        description: 'The source which identified the lemma'
+      }
+    };
+  },
+  interfaces: [lexicalObjectInterface]
+});
+
+inflectionInputType = new gql.GraphQLInputObjectType({
   name: 'Inflection',
   description: 'An inflection',
   fields() {
@@ -67,13 +164,13 @@ const inflectionInputType = new gql.GraphQLInputObjectType({
     }
   }
 });
-const lexemeInputType = new gql.GraphQLInputObjectType({
-  name: "lexeme",
+lexemeInputType = new gql.GraphQLInputObjectType({
+  name: "LexemeInputType",
   description: 'A lexeme',
   fields: () => ({
-    id: {
+    IRI: {
       type: gql.GraphQLString,
-      description: 'The id of the lexeme.'
+      description: 'The IRI of the lexeme.'
     },
     lemma: {
       type: lemmaInputType,
@@ -82,17 +179,34 @@ const lexemeInputType = new gql.GraphQLInputObjectType({
     inflections: {
       description: 'Inflections',
       type: new gql.GraphQLList(inflectionInputType)
-    },
-    provider: {
-      description: 'Provider',
-      type: new gql.GraphQLNonNull(gql.GraphQLString)
     }
   })
 });
+
+lexemeOutputType = new gql.GraphQLObjectType({
+  name: "Lexeme",
+  description: 'A lexeme',
+  fields: () => ({
+    IRI: {
+      type: gql.GraphQLString,
+      description: 'The IRI of the lexeme.'
+    },
+    lemma: {
+      type: lemmaOutputType,
+      description: 'The lemma'
+    }
+  }),
+  interfaces: [ lexicalObjectInterface ]
+});
+
 
 module.exports = {
   LexemeInputType: lexemeInputType,
   LemmaInputType: lemmaInputType,
   InflectionInputType: inflectionInputType,
-  LemmaVariantInputType: lemmaVariantInputType
+  LemmaVariantInputType: lemmaVariantInputType,
+  LexicalObjectInterface: lexicalObjectInterface,
+  LexicalObjectOutputType: lexicalObjectOutputType,
+  LemmaOutputType: lemmaOutputType,
+  LexemeOutputType: lexemeOutputType
 };

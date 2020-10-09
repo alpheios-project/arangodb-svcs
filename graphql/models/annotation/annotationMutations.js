@@ -5,7 +5,7 @@ const query = require('../../../queries/query');
 module.exports = {
 
   createLemmaVariant: {
-    type: annotationSchema.AnnotationType,
+    type: annotationSchema.AnnotationSetType,
     description: 'Create  a lemma variant annotation',
     args: {
       input: {
@@ -13,7 +13,16 @@ module.exports = {
       },
     },
     resolve(value, {input}) {
-      const variantExists = query.findLemmaVariant(input.lemma,input.variantLemma);
+      // logic here should be
+      // check to see if the variant exists already
+      // if not:
+      //    see if we need to create either lemma
+      //      if so: create the lemma(s)
+      //    create the lemma variant
+      // then create the assertsTrue assertion for the isLemmaVariant relationship
+      // should all be in a transaction
+
+      const variantExists = query.findSpecificLemmaVariant(input.lemma,input.variantLemma);
       if (variantExists.length > 0) {
         return {
           id: 'http://id/annotation',

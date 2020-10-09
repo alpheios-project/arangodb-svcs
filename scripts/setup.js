@@ -25,18 +25,24 @@ const replace_node_key = (key) => {
   }
 
 };
+let doEdgeFixtures = {};
 for (const name of cnames.edgeCollections) {
   const ctxName = module.context.collectionName(name);
   if (!db._collection(ctxName)) {
     const coll = db._createEdgeCollection(ctxName);
-    if (cnames.fixturesEdges[name]) {
-      cnames.fixturesEdges[name].forEach( (item) => {
-        item._from = replace_node_key(item._from);
-        item._to = replace_node_key(item._to);
-        coll.save(item);
-      });
-    }
+    doEdgeFixtures[name] = true;
   }
-}
+};
+
+for (const dataset of cnames.fixturesEdges) {
+  if (doEdgeFixtures[dataset.cname]) {
+    const coll = module.context.collection(dataset.cname)
+    dataset.data.forEach( (item) => {
+      item._from = replace_node_key(item._from);
+      item._to = replace_node_key(item._to);
+      coll.save(item);
+    });
+  }
+};
 
 

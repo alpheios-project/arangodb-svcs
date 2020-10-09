@@ -5,34 +5,37 @@ const lexicalSchema = require('../lexical/lexicalSchema');
 const query = require('../../../queries/query');
 
 module.exports = {
-  lexemeAnnotations: {
-    type: new gql.GraphQLList(annotationSchema.AnnotationType),
+  wordAnnotations: {
+    type: new gql.GraphQLList(annotationSchema.AnnotationSetType),
     args: {
       word: {
-        description: 'The word',
+        description: 'A word',
         type: new gql.GraphQLNonNull(gql.GraphQLString)
       },
       lexemes: {
-        description: 'Any available lexemes',
+        description: 'Any lexemes as possible annotation targets for this word.',
         type: new gql.GraphQLList(lexicalSchema.LexemeInputType)
       }
     },
-    resolve(root, args) {
-      const lemmas = query.findLemma({form:"afore"});
-      return [
+    resolve(root,{word, lexemes}) {
+      let annotations = [];
+      for (lexeme of lexemes) {
+        annotations.push(
         {
-          id: lemmas[0]._id,
-          lexemeId: 'http://id/lexeme',
-          assertions: [
-            {
-              id: 'http://any',
-              subject: 'afore',
-              predicate: 'hasPreferredLemmaVariant',
-              object: 'absum'
-            }
-          ]
-        }
-      ]
+              target: lexeme,
+              assertions: query.findAllLemmaVariants(lexeme.lemma)
+         }
+       )
+     }
+     return annotations;
     }
+  },
+  lemma: {
+    type: lexicalSchema.LemmaOutputType,
+    description: "exposing lemma output"
+  },
+  lexeme: {
+    type: lexicalSchema.LexemeOutputType,
+    description: "exposing lexeme output"
   }
 };
