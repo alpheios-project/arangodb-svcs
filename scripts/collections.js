@@ -14,6 +14,7 @@ const documentCollections = [
 const edgeCollections = [
   'hasLemma',
   'isLemmaVariant',
+  'isSpellingVariant',
   'hasDefinition',
   'hasFeature',
   'isTranslationOf',
@@ -34,6 +35,20 @@ const fixturesNodes = {
   words: [
     { _key: 'tinosgrc',
       representation: 'τίνος',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'memenealt1',
+      representation: 'μεμνῄμεθα',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'memenealt2',
+      representation: 'μεμνήμεθα',
       lang: 'grc',
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
@@ -219,6 +234,16 @@ const fixturesEdges = [
       }
     ]
   },
+  { cname: 'isSpellingVariant',
+    data: [
+      { _key: 'memenealt1varmenalt2',
+        _from: 'CTX_words/memenealt1',
+        _to: 'CTX_words/memenealt2',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      }
+    ]
+  },
   {
     cname: 'assertsFalse',
     data: [
@@ -260,6 +285,12 @@ const fixturesEdges = [
       },
       { _from: 'CTX_users/net.alpheios',
         _to: 'CTX_canBeInflectionOf/tinosgensingtis',
+        assertion: true,
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_isSpellingVariant/memenealt1varmenalt2',
         assertion: true,
         degreeOfConfidence: '10',
         isPublic: true

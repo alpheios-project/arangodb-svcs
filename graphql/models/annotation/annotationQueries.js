@@ -5,6 +5,26 @@ const lexicalSchema = require('../lexical/lexicalSchema');
 const query = require('../../../queries/query');
 
 module.exports = {
+  spellingVariants: {
+    type: new gql.GraphQLList(annotationSchema.AnnotationSetType),
+    args: {
+      word: {
+        description: 'A word',
+        type: lexicalSchema.WordInputType
+      }
+    },
+    resolve(root, {word}) {
+      let assertions = query.findSpellingVariants(word)
+      if (assertions) {
+        return [{
+          target: assertions[0].subject,
+          assertions: assertions
+        }]
+      } else {
+        return []
+      }
+    }
+  },
   wordAnnotations: {
     type: new gql.GraphQLList(annotationSchema.AnnotationSetType),
     args: {
@@ -28,7 +48,6 @@ module.exports = {
         });
         wordLexemes = wordAssertions.map((a) => { return { lemma: a.object } });
       }
-      console.log("WL",wordLexemes);
       for (lexeme of [...lexemes,...wordLexemes]) {
         let assertions = query.findAllLemmaVariants(lexeme.lemma);
         let inflections = query.findAllInflections(lexeme.lemma);

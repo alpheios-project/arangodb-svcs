@@ -43,3 +43,69 @@ query {
     }
   }
 }
+
+query {
+  wordAnnotations(
+  word:{
+    representation:"τίνος",
+    lang: "grc"
+  },
+  lexemes: [{
+    lemma: {
+    	representation:"τίς",
+    	pos: X,
+    	principalParts:[],
+    	lang:"grc",
+      source:"morphgrc"
+    }
+  }]) {
+    target {
+      IRI
+      ... on Word {
+        IRI
+        representation
+        lang
+      }
+      ... on Lexeme {
+        lemma {
+          IRI
+          representation
+        }
+      }
+    }
+    assertions {
+      subject {
+        IRI
+        ... on Lemma {
+          representation
+          pos
+          lang
+          principalParts
+        }
+      }
+      predicate
+      object {
+        IRI
+        ... on Inflection {
+          udfeatures {
+            Case
+            Gender
+            Number
+          }
+        },
+        ... on Word {
+          representation
+          lang
+        },
+        ... on Lemma {
+          representation
+          pos
+          principalParts
+        }
+      },
+      authorities
+
+      
+    }
+  }
+}

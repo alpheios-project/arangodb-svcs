@@ -2,12 +2,31 @@ const query = require('@arangodb').query;
 
 const words = module.context.collection('words');
 const lemmas = module.context.collection('lemmas');
+const spellingVariants = module.context.collection('isSpellingVariant');
 const hasLemma = module.context.collection('hasLemma');
 const lemmaVariants = module.context.collection('isLemmaVariant');
 const assertsTrue = module.context.collection('assertsTrue');
 const assertsFalse = module.context.collection('assertsFalse');
 const inflections = module.context.collection('inflections');
 const inflectionsOf = module.context.collection('canBeInflectionOf');
+
+const findSpellingVariants = (word) => {
+    console.log("FIND S",word);
+    const result = query`
+    FOR tgtWord in ${words}
+    FILTER tgtWord.representation == ${word.representation} && tgtWord.lang == ${word.lang}
+      FOR v,e,p in 1..1 INBOUND tgtWord._id ${spellingVariants}
+      LET assertions = (
+        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsTrue}
+        FILTER e2.isPublic == true
+        RETURN e2
+      )
+      FILTER length(assertions) > 0
+      FOR assertion in assertions
+        RETURN { subject: document(e._to), predicate: 'hasSpellingVariant', object: document(e._from), authorities: assertions[*]._from, qualifiers: {} }
+    `.toArray();
+    return result;
+};
 
 const findLemmasForWord = (word) => {
   const result = query`
@@ -96,5 +115,6 @@ module.exports = {
   findSpecificLemmaVariant: findSpecificLemmaVariant,
   findAllLemmaVariants: findAllLemmaVariants,
   findAllInflections: findAllInflections,
-  findLemmaNegations: findLemmaNegations
+  findLemmaNegations: findLemmaNegations,
+  findSpellingVariants: findSpellingVariants
 };
