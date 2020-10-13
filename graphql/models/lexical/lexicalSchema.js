@@ -1,7 +1,7 @@
 'use strict';
 const gql = require('graphql-sync');
 
-let lemmaInputType, inflectionInputType, lexemeInputType, lemmaOutputType, lexemeOutputType;
+let lemmaInputType, inflectionInputType, lexemeInputType, lemmaOutputType, lexemeOutputType, inflectionOutputType, wordInputType, wordOutputType;
 
 const lexicalObjectInterface = new gql.GraphQLInterfaceType({
   name: "LexicalObjectInterface",
@@ -15,9 +15,14 @@ const lexicalObjectInterface = new gql.GraphQLInterfaceType({
     }
   },
   resolveType(obj) {
+    console.log("RESOLVE",obj);
     if (obj._id) {
       if (obj._id.match(/lemmas\//)) {
         return lemmaOutputType;
+      } else if (obj._id.match(/inflections\//)) {
+        return inflectionOutputType
+      } else if (obj._id.match(/words\//)) {
+        return wordOutputType
       }
     } else if (obj.lemma) {
       return lexemeOutputType;
@@ -26,6 +31,81 @@ const lexicalObjectInterface = new gql.GraphQLInterfaceType({
     }
   }
 });
+
+const UDPOSEnum = new gql.GraphQLEnumType({
+  name: 'UDPOSEnum',
+  description: "Enumeration of Universal Dependencies Part of Speech Tags",
+  values: {
+    ADJ: {
+      value: "ADJ",
+      description: "adjective"
+    },
+    ADP: {
+      value: "ADP",
+      description: "adposition"
+    },
+    ADV: {
+      value: "ADV",
+      description: "adverb"
+    },
+    AUX: {
+      value: "AUX",
+      description: "auxiliary"
+    },
+    CCONJ: {
+      value: "CCONJ",
+      description: "coordinating conjunction"
+    },
+    DET: {
+      value: "DET",
+      description: "determiner"
+    },
+    INTJ: {
+      value:"INTJ",
+      description: "interjection"
+    },
+    NOUN: {
+      value: "NOUN",
+      description: "noun"
+    },
+    NUM: {
+      value: "NUM",
+      description: "numeral"
+    },
+    PART: {
+      value: "PART",
+      description: "particle"
+    },
+    PRON: {
+      value: "PRON",
+      description: "pronoun"
+    },
+    PROPN: {
+      value: "PROPN",
+      description: "proper noun"
+    },
+    PUNCT: {
+      value: "PUNCT",
+      description: "punctuation"
+    },
+    SCONJ: {
+      value: "SCONJ",
+      description: "subordinating conjunction"
+    },
+    SYM: {
+      value: "SYM",
+      description: "symbol"
+    },
+    VERB: {
+      value: "VERB",
+      description: "verb"
+    },
+    X: {
+      value: "X",
+      description: "other"
+    }
+  }
+})
 
 const preferVariantEnum = new gql.GraphQLEnumType({
   name: 'preferVariant',
@@ -81,6 +161,48 @@ const lexicalObjectOutputType = new gql.GraphQLObjectType({
   interfaces: [lexicalObjectInterface]
 });
 
+wordInputType = new gql.GraphQLInputObjectType({
+  name: 'WordInput',
+  description: 'A word passed in input.',
+  fields() {
+    return {
+      representation: {
+        type: gql.GraphQLString,
+        description: 'Written representation of the word.'
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the word'
+      }
+    }
+  }
+});
+
+wordOutputType = new gql.GraphQLObjectType({
+  name: 'Word',
+  description: 'A word.',
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: "IRI of the word",
+        resolve(word) {
+          return word._id;
+        }
+      },
+      representation: {
+        type: gql.GraphQLString,
+        description: 'Written representation of the word.'
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the word'
+      }
+    }
+  },
+  interfaces: [lexicalObjectInterface]
+});
+
 lemmaInputType = new gql.GraphQLInputObjectType({
   name: 'LemmaInput',
   description: 'A lemma passed in input.',
@@ -95,8 +217,12 @@ lemmaInputType = new gql.GraphQLInputObjectType({
         description: 'Canonical written representation of the lemma.'
       },
       pos: {
-        type: gql.GraphQLString,
+        type: UDPOSEnum,
         description: 'The part of speech of the lemma'
+      },
+      langpos: {
+        type: gql.GraphQLString,
+        description: 'language specific pos (when UDPOS == "X")'
       },
       lang: {
         type: gql.GraphQLString,
@@ -121,15 +247,22 @@ lemmaOutputType = new gql.GraphQLObjectType({
     return {
       IRI: {
         type: gql.GraphQLString,
-        description: 'The IRI of the lemma.'
+        description: 'The IRI of the lemma.',
+        resolve(lemma) {
+          return lemma._id
+        }
       },
       representation: {
         type: gql.GraphQLString,
         description: 'Canonical written representation of the lemma.'
       },
       pos: {
-        type: gql.GraphQLString,
+        type: UDPOSEnum,
         description: 'The part of speech of the lemma'
+      },
+      langpos: {
+        type: gql.GraphQLString,
+        description: 'language specific pos (when UDPOS == "X")'
       },
       lang: {
         type: gql.GraphQLString,
@@ -148,22 +281,297 @@ lemmaOutputType = new gql.GraphQLObjectType({
   interfaces: [lexicalObjectInterface]
 });
 
-inflectionInputType = new gql.GraphQLInputObjectType({
-  name: 'Inflection',
-  description: 'An inflection',
+
+const ExtraFeatureType = new gql.GraphQLObjectType({
+  name: "ExtraFeatureType",
+  description: "Extra Features",
   fields() {
     return {
-      id: {
-        type: gql.GraphQLString,
-        description: 'The id of the inflection'
+      Declension: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "declension"
       },
-      udstring: {
-        type: new gql.GraphQLNonNull(gql.GraphQLString),
-        description: 'Universal Dependencies Morph String'
+      Var: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "var"
+      },
+      Stemtype: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "stemtype"
+      },
+      Morphtype: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "morphtype"
       }
     }
   }
 });
+
+const ExtraFeatureInputType = new gql.GraphQLInputObjectType({
+  name: "ExtraFeatureInputType",
+  description: "Extra Features",
+  fields() {
+    return {
+      Declension: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "declension"
+      },
+      Var: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "var"
+      },
+      Stemtype: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "stemtype"
+      },
+      Morphtype: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "morphtype"
+      }
+    }
+  }
+});
+
+const UDFeatureInputType = new gql.GraphQLInputObjectType({
+  name: "UDFeatureInputType",
+  description: "Universal Dependency Features",
+  fields() {
+    return {
+      Animacy: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "animacy"
+      },
+      Gender: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'gender'
+      },
+      NounClass: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'noun class'
+      },
+      Number: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'number'
+      },
+      Case: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'case'
+      },
+      Definite: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'definite'
+      },
+      Degree: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'degree'
+      },
+      VerbForm: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'verb form'
+      },
+      Mood: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'mood'
+      },
+      Tense: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'tense'
+      },
+      Aspect: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'aspect'
+      },
+      Voice: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'voice'
+      },
+      Evident: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'evident'
+      },
+      Polarity: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'polarity'
+      },
+      Person: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'person'
+      },
+      Polite: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'polite'
+      },
+      Clusivity: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'clusivity'
+      }
+    }
+  }
+});
+
+const UDFeatureType = new gql.GraphQLObjectType({
+  name: "UDFeatureType",
+  description: "Universal Dependency Features",
+  fields() {
+    return {
+      Animacy: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: "animacy"
+      },
+      Gender: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'gender'
+      },
+      NounClass: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'noun class'
+      },
+      Number: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'number'
+      },
+      Case: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'case'
+      },
+      Definite: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'definite'
+      },
+      Degree: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'degree'
+      },
+      VerbForm: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'verb form'
+      },
+      Mood: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'mood'
+      },
+      Tense: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'tense'
+      },
+      Aspect: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'aspect'
+      },
+      Voice: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'voice'
+      },
+      Evident: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'evident'
+      },
+      Polarity: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'polarity'
+      },
+      Person: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'person'
+      },
+      Polite: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'polite'
+      },
+      Clusivity: {
+        type: gql.GraphQLString, // TODO use Enum
+        description: 'clusivity'
+      }
+    }
+  }
+});
+
+inflectionOutputType = new gql.GraphQLObjectType({
+  name: 'Inflection',
+  description: 'An inflection',
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: 'The IRI of the inflection',
+        resolve(inflection) {
+          return inflection._id
+        }
+      },
+      form: {
+        type: gql.GraphQLString,
+        description: "form"
+      },
+      stem: {
+        type: gql.GraphQLString,
+        description: "stem"
+      },
+      suffix: {
+        type: gql.GraphQLString,
+        description: "suffix"
+      },
+      prefix: {
+        type: gql.GraphQLString,
+        description: "prefix"
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the lemma'
+      },
+      udfeatures: {
+        type: UDFeatureType,
+        description: "Universal Dependency Features"
+      },
+      xfeatures: {
+        type: ExtraFeatureType,
+        description: "Extra Features"
+      }
+    }
+  },
+  interfaces: [lexicalObjectInterface]
+});
+
+inflectionInputType = new gql.GraphQLInputObjectType({
+  name: 'InflectionInput',
+  description: 'An inflection',
+  fields() {
+    return {
+      IRI: {
+        type: gql.GraphQLString,
+        description: 'The IRI of the inflection'
+      },
+      form: {
+        type: gql.GraphQLString,
+        description: "form"
+      },
+      stem: {
+        type: gql.GraphQLString,
+        description: "stem"
+      },
+      suffix: {
+        type: gql.GraphQLString,
+        description: "suffix"
+      },
+      prefix: {
+        type: gql.GraphQLString,
+        description: "prefix"
+      },
+      lang: {
+        type: gql.GraphQLString,
+        description: 'The language of the lemma'
+      },
+      udfeatures: {
+        type: UDFeatureInputType,
+        description: "Universal Dependency Features"
+      },
+      xfeatures: {
+        type: ExtraFeatureInputType,
+        description: "Extra features not included in UD"
+      }
+    }
+  }
+});
+
 lexemeInputType = new gql.GraphQLInputObjectType({
   name: "LexemeInputType",
   description: 'A lexeme',
@@ -177,8 +585,8 @@ lexemeInputType = new gql.GraphQLInputObjectType({
       description: 'The lemma'
     },
     inflections: {
-      description: 'Inflections',
-      type: new gql.GraphQLList(inflectionInputType)
+      type: new gql.GraphQLList(inflectionInputType),
+      description: 'Inflections'
     }
   })
 });
@@ -208,5 +616,8 @@ module.exports = {
   LexicalObjectInterface: lexicalObjectInterface,
   LexicalObjectOutputType: lexicalObjectOutputType,
   LemmaOutputType: lemmaOutputType,
-  LexemeOutputType: lexemeOutputType
+  LexemeOutputType: lexemeOutputType,
+  InflectionOutputType: inflectionOutputType,
+  WordInputType: wordInputType,
+  WordOutputType: wordOutputType
 };

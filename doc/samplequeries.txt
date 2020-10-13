@@ -1,0 +1,45 @@
+Query for Lemma Variants
+
+query {
+  wordAnnotations(word:"accurro",
+  lexemes: [{
+    lemma: {
+    	representation:"accurro",
+    	pos:"noun",
+    	principalParts:["accurrere", "accucurri", "accursus"],
+    	lang:"lat",
+    	source:"whitaker"
+    }
+  }]) {
+    target {
+      ... on Lexeme {
+        lemma {
+          representation
+        }
+      }
+    }
+    assertions {
+      subject {
+        ... on Lemma {
+        	lang
+          pos
+          representation
+          source
+        }
+      }
+      object {
+        ... on Lemma {
+          lang
+          pos
+          representation
+          source
+        }
+      }
+      predicate
+      qualifiers {
+        prefer
+      }
+      authorities
+    }
+  }
+}

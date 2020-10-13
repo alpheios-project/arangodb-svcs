@@ -17,7 +17,7 @@ const edgeCollections = [
   'hasDefinition',
   'hasFeature',
   'isTranslationOf',
-  'canBeInflection',
+  'canBeInflectionOf',
   'assertsTrue',
   'assertsFalse',
   'makesComment',
@@ -31,11 +31,19 @@ const fixturesNodes = {
       iri: 'https://alpheios.net'
     }
   ],
+  words: [
+    { _key: 'tinosgrc',
+      representation: 'τίνος',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    }
+  ],
   lemmas: [
     { _key: 'whitlatafore',
       representation: 'afore',
       lang: 'lat',
-      pos: 'verb',
+      pos: 'VERB',
       principalParts: [],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'alpheios.net' ,
@@ -44,7 +52,7 @@ const fixturesNodes = {
     { _key: 'whitlatabsum',
       representation: 'absum',
       lang: 'lat',
-      pos: 'verb' ,
+      pos: 'VERB' ,
       principalParts: [],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'alpheios.net' ,
@@ -53,7 +61,7 @@ const fixturesNodes = {
     { _key: 'whitlatvult',
       representation: 'vult',
       lang: 'lat',
-      pos: 'verb',
+      pos: 'VERB',
       principalParts: [],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'alpheios.net',
@@ -62,7 +70,7 @@ const fixturesNodes = {
     { _key: 'whitlatvolo',
       representation: 'volo',
       lang: 'lat',
-      pos: 'verb',
+      pos: 'VERB',
       principalParts: [],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'alpheios.net',
@@ -71,7 +79,7 @@ const fixturesNodes = {
     { _key: 'whitlataccurro1',
       representation: 'accurro',
       lang: 'lat',
-      pos: 'noun',
+      pos: 'NOUN',
       principalParts: ['accurrere','accucurri','accursus'],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'CTX_users/net.alpheios',
@@ -80,16 +88,112 @@ const fixturesNodes = {
     { _key: 'whitlataccurro2',
       representation: 'volo',
       lang: 'lat',
-      pos: 'noun',
+      pos: 'NOUN',
       principalParts: ['accurrere','accurri','accursus'],
       source: 'net.alpheios:tools:wordsxml.v1',
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     },
+    { _key: 'whitlatsenatus',
+      representation: 'senatus',
+      lang: 'lat',
+      pos: 'NOUN',
+      principalParts: ['senatus'],
+      source: 'net.alpheios:tools:wordsxml.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    { _key: 'morphgrctisx',
+      representation: 'τίς',
+      lang: 'grc',
+      pos: 'X',
+      langpos: 'irregular',
+      principalParts: [],
+      source: 'net.alpheios:tools:wordsxml.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    { _key: 'morphgrctis',
+      representation: 'τίς',
+      lang: 'grc',
+      pos: 'PRON',
+      principalParts: [],
+      source: 'net.alpheios:tools:wordsxml.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    }
+  ],
+  inflections: [
+    {
+      _key: 'tinostisgensing',
+      form: "τίνος",
+      stem: "τίνος",
+      udfeatures: {
+        Case: 'genitive',
+        Number: 'singular',
+      },
+      xfeatures: {
+        stemtype: 'inter',
+        morphtype: 'enclitic indeclform'
+      }
+    },
+    {
+      _key: 'inflatsenatusvoc',
+      form: 'senatu',
+      stem: 'senat',
+      suffix: 'u',
+      udfeatures: {
+        Case: 'vocative',
+        Number: 'singular',
+        Gender: 'masculine'
+      },
+      xfeatures: {
+        Declension: '4th',
+        Var: '1st'
+      },
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    }
   ]
 };
 
 const fixturesEdges = [
+  { cname: 'hasLemma',
+    data: [
+      {
+        _key: 'tinostisx',
+        _from: 'CTX_words/tinosgrc',
+        _to: 'CTX_lemmas/morphgrctisx',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
+      {
+        _key: 'tinostis',
+        _from: 'CTX_words/tinosgrc',
+        _to: 'CTX_lemmas/morphgrctis',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      }
+    ]
+  },
+  { cname: 'canBeInflectionOf',
+    data: [
+      {
+        _key: 'senatuvocsenatus',
+        _from: 'CTX_inflections/inflatsenatusvoc',
+        _to: 'CTX_lemmas/whitlatsenatus',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
+      {
+        _key: 'tinosgensingtis',
+        _from: 'CTX_inflections/tinostisgensing',
+        _to: 'CTX_lemmas/morphgrctis',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      }
+    ]
+  },
   { cname: 'isLemmaVariant',
     data: [
       { _key: 'aforevarabsum',
@@ -116,8 +220,28 @@ const fixturesEdges = [
     ]
   },
   {
+    cname: 'assertsFalse',
+    data: [
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_hasLemma/tinostisx',
+        degreeOfConfidence: '10',
+        isPublic: true
+      }
+    ]
+  },
+  {
     cname: 'assertsTrue',
     data: [
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_hasLemma/tinostis',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_canBeInflectionOf/senatuvocsenatus',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
       { _from: 'CTX_users/net.alpheios',
         _to: 'CTX_isLemmaVariant/aforevarabsum',
         degreeOfConfidence: '10',
@@ -130,6 +254,12 @@ const fixturesEdges = [
       },
       { _from: 'CTX_users/net.alpheios',
         _to: 'CTX_isLemmaVariant/accurro1varaccurro2',
+        assertion: true,
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_canBeInflectionOf/tinosgensingtis',
         assertion: true,
         degreeOfConfidence: '10',
         isPublic: true

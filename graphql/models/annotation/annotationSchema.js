@@ -1,6 +1,18 @@
 const gql = require('graphql-sync');
 const lexicalSchema = require('../lexical/lexicalSchema');
 
+const qualifierType = new gql.GraphQLObjectType({
+  name: "Qualifier",
+  description: "Qualifies an assertion",
+  fields() {
+    return {
+      prefer: {
+        type: gql.GraphQLString,
+        description: "The IRI of the preferred resource in a relationship"
+      }
+    }
+  }
+})
 const assertionType = new gql.GraphQLObjectType({
   name: 'Assertion',
   description: 'An assertion',
@@ -15,12 +27,16 @@ const assertionType = new gql.GraphQLObjectType({
         description: 'The assertion predicate'
       },
       object: {
-        type: lexicalSchema.LexicalObjectOutputType,
+        type: lexicalSchema.LexicalObjectInterface,
         description: 'The object of the assertion'
       },
       authorities: {
         type: new gql.GraphQLList(gql.GraphQLString),
         description: 'Authorities for this assertion'
+      },
+      qualifiers: {
+        type: qualifierType,
+        description: "qualifiers"
       }
     }
   }
