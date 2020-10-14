@@ -41,7 +41,7 @@ module.exports = {
       let annotations = [];
       let wordAssertions = query.findLemmasForWord(word);
       let wordLexemes = [];
-      if (wordAssertions) {
+      if (wordAssertions.length > 0) {
         annotations.push({
           target: wordAssertions[0].subject,
           assertions: wordAssertions
