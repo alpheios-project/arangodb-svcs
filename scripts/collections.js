@@ -30,9 +30,18 @@ const fixturesNodes = {
   users: [
     { _key: 'net.alpheios',
       iri: 'https://alpheios.net'
+    },
+    { _key: 'balmas',
+      iri: 'https://orcid.org/0000-0001-7556-1572'
     }
   ],
   words: [
+    { _key: 'dicerelat',
+      representation: 'dicere',
+      lang: 'lat',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
     { _key: 'tinosgrc',
       representation: 'τίνος',
       lang: 'grc',
@@ -55,6 +64,24 @@ const fixturesNodes = {
     }
   ],
   lemmas: [
+    { _key: 'whitlatdico1',
+      representation: 'dico',
+      lang: 'lat',
+      pos: 'VERB',
+      principalParts: ['dicere','dixi','dictus'],
+      source: 'net.alpheios:tools:wordsxml.v1',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    { _key: 'whitlatdico2',
+      representation: 'dico',
+      lang: 'lat',
+      pos: 'VERB',
+      principalParts: ['dicare','dicavi','dicatus'],
+      source: 'net.alpheios:tools:wordsxml.v1',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
     { _key: 'whitlatafore',
       representation: 'afore',
       lang: 'lat',
@@ -140,6 +167,17 @@ const fixturesNodes = {
   ],
   inflections: [
     {
+      _key: 'dicerelatpresinfact',
+      form: 'dicere',
+      stem: 'dic',
+      suffix: 'ere',
+      udfeatures: {
+        Tense: 'present',
+        Voice: 'active',
+        Mood: 'infinitive'
+      }
+    },
+    {
       _key: 'tinostisgensing',
       form: "τίνος",
       stem: "τίνος",
@@ -169,12 +207,29 @@ const fixturesNodes = {
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     }
+  ],
+  contexts: [
+    {
+      _key: 'dicereovidmet1',
+      word: 'dicere',
+      suffix: 'fert animus mutatus ',
+      prefix: ' formas corpora; di',
+      url: 'https://texts.alpheios.net/text/urn:cts:latinLit:phi0959.phi006.alpheios-text-lat1/passage/1.1-1.30',
+      createdBy: 'CTX_users/balmas',
+      createdOn: new Date().toString()
+    }
   ]
 };
 
 const fixturesEdges = [
   { cname: 'hasLemma',
     data: [
+      { _key: 'diceredico2',
+        _from: 'CTX_words/dicerelat',
+        _to: 'CTX_lemmas/diceredico2',
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
       {
         _key: 'tinostisx',
         _from: 'CTX_words/tinosgrc',
@@ -193,6 +248,13 @@ const fixturesEdges = [
   },
   { cname: 'canBeInflectionOf',
     data: [
+      {
+        _key: "dicerelatpresinfactdico2",
+        _from: "CTX_inflections/dicerelatpresinfact",
+        _to: "CTX_lemmas/whitlatdico2",
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
       {
         _key: 'senatuvocsenatus',
         _from: 'CTX_inflections/inflatsenatusvoc',
@@ -244,6 +306,24 @@ const fixturesEdges = [
       }
     ]
   },
+  { cname: 'attestedAt',
+    data: [
+      {
+        _key: 'disamdiceredicolemma',
+        _from: 'CTX_hasLemma/diceredico2',
+        _to: 'CTX_contexts/dicereovidmet1',
+        createdBy: 'CTX_users/balmas',
+        createdOn: new Date().toString()
+      },
+      {
+        _key: 'disamdiceredicoinfl',
+        _from: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
+        _to: 'CTX_contexts/dicereovidmet1',
+        createdBy: 'CTX_users/balmas',
+        createdOn: new Date().toString()
+      }
+    ]
+  },
   {
     cname: 'assertsFalse',
     data: [
@@ -257,6 +337,36 @@ const fixturesEdges = [
   {
     cname: 'assertsTrue',
     data: [
+      { _from: 'CTX_users/balmas',
+        _to: 'CTX_attestedAt/disamdiceredicolemma',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/balmas',
+        _to: 'CTX_attestedAt/disamdiceredicoinfl',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/balmas',
+        _to: 'CTX_hasLemma/diceredico2',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/balmas',
+        _to: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_hasLemma/diceredico2',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
+      { _from: 'CTX_users/net.alpheios',
+        _to: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
+        degreeOfConfidence: '10',
+        isPublic: true
+      },
       { _from: 'CTX_users/net.alpheios',
         _to: 'CTX_hasLemma/tinostis',
         degreeOfConfidence: '10',
