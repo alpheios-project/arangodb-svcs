@@ -1,118 +1,77 @@
 const query = require('@arangodb').query;
 
-const words = module.context.collection('words');
-const lemmas = module.context.collection('lemmas');
-const spellingVariants = module.context.collection('isSpellingVariant');
-const hasLemma = module.context.collection('hasLemma');
-const lemmaVariants = module.context.collection('isLemmaVariant');
-const assertsTrue = module.context.collection('assertsTrue');
-const assertsFalse = module.context.collection('assertsFalse');
-const inflections = module.context.collection('inflections');
-const inflectionsOf = module.context.collection('canBeInflectionOf');
+const lexicalEntities_lat = module.context.collection('lexicalEntities_lat');
+const lexicalEntities_grc = module.context.collection('lexicalEntities_grc');
+const lexicalRelations = module.context.collection('lexicalRelations');
+
+const _getEntities = (lang) => {
+    return lang === 'lat' ? lexicalEntities_lat : lexicalEntities_grc; // TODO do this better
+};
 
 const findSpellingVariants = (word) => {
-    console.log("FIND S",word);
+    const entities = _getEntities(word.lang);
     const result = query`
-    FOR tgtWord in ${words}
-    FILTER tgtWord.representation == ${word.representation} && tgtWord.lang == ${word.lang}
-      FOR v,e,p in 1..1 INBOUND tgtWord._id ${spellingVariants}
-      LET assertions = (
-        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsTrue}
-        FILTER e2.isPublic == true
-        RETURN e2
-      )
-      FILTER length(assertions) > 0
-      FOR assertion in assertions
-        RETURN { subject: document(e._to), predicate: 'hasSpellingVariant', object: document(e._from), authorities: assertions[*]._from, qualifiers: {} }
+    FOR tgtWord in ${entities}
+    FILTER tgtWord.type == 'alpheios:word' && tgtWord.representation == ${word.representation}
+      FOR v,e,p in 1..1 INBOUND tgtWord._id ${lexicalRelations}
+      FILTER e.isPublic == true && e.type == 'isSpellingVariant'
+      RETURN { subject: document(e._to), predicate: e.type, object: document(e._from), authorities: [e.createdBy], qualifiers: [] }
     `.toArray();
     return result;
 };
 
 const findLemmasForWord = (word) => {
+  const entities = _getEntities(word.lang);
   const result = query`
-    FOR tgtWord in ${words}
-    FILTER tgtWord.representation == ${word.representation} && tgtWord.lang == ${word.lang}
-      FOR v,e,p in 1..1 OUTBOUND tgtWord._id ${hasLemma}
-      LET assertions = (
-        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsTrue}
-        FILTER e2.isPublic == true
-        RETURN e2
-      )
-      FILTER length(assertions) > 0
-      FOR assertion in assertions
-        RETURN { subject: document(e._from), predicate: 'hasLemma', object: document(e._to), authorities: assertions[*]._from, qualifiers: {} }
+    FOR tgtWord in ${entities}
+    FILTER tgtWord.type == 'alpheios:word' && tgtWord.representation == ${word.representation}
+      FOR v,e,p in 1..1 INBOUND tgtWord._id ${lexicalRelations}
+      FILTER e.isPublic == true && e.type == 'isLemmaOf'
+      RETURN { subject: document(e._to), predicate: 'hasLemma', object: document(e._from), authorities: [e.createdBy], qualifiers: {} }
   `.toArray();
   return result;
 };
 
 const findLemmaNegations = (word,lemma) => {
+  const entities = _getEntities(word.lang);
   const result = query`
-    FOR tgtWord in ${words}
-    FILTER tgtWord.representation == ${word.representation} && tgtWord.lang == ${word.lang}
-      FOR v,e,p in 1..1 OUTBOUND tgtWord._id ${hasLemma}
-      FILTER v.representation == ${lemma.representation} && v.lang == ${lemma.lang} && v.pos == ${lemma.pos} && v.principalParts == ${lemma.principalParts}
-      LET assertions = (
-        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsFalse}
-        FILTER e2.isPublic == true
-        RETURN e2
-      )
-      FILTER length(assertions) > 0
-      FOR assertion in assertions
-        RETURN { subject: document(e._to), predicate: 'isNotLemmaOf', object: document(e._from), authorities: assertions[*]._from, qualifiers: {} }
+    FOR tgtWord in ${entities}
+    FILTER tgtWord.type == 'alpheios:word' && tgtWord.representation == ${word.representation}
+      FOR v,e,p in 1..1 INBOUND tgtWord._id ${lexicalRelations}
+      FILTER e.isPublic == true && e.type == 'isNotLemmaOf' && v.representation == ${lemma.representation} && v.pos == ${lemma.pos} && v.principalParts == ${lemma.principalParts}
+      RETURN { subject: document(e._to), predicate: 'doesNotHaveLemma', object: document(e._from), authorities: [e.createdBy], qualifiers: {} }
   `.toArray();
   return result;
 }
 
 
 const findAllInflections = (lemma) => {
+  const entities = _getEntities(lemma.lang);
   const result = query`
-    FOR tgtLemma in ${lemmas}
-    FILTER tgtLemma.representation == ${lemma.representation} && tgtLemma.lang == ${lemma.lang} && tgtLemma.pos == ${lemma.pos} && tgtLemma.principalParts == ${lemma.principalParts}
-      FOR v,e,p in 1..1 INBOUND tgtLemma._id ${inflectionsOf}
-      LET assertions = (
-        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsTrue}
-        FILTER e2.isPublic == true
-        RETURN e2
-      )
-      FILTER length(assertions) > 0
-      FOR assertion in assertions
-        RETURN { subject: document(e._to), predicate: 'hasInflection', object: document(e._from), authorities: assertions[*]._from, qualifiers: {} }
+    FOR tgtLemma in ${entities}
+    FILTER tgtLemma.type == 'alpheios:lemma' && tgtLemma.representation == ${lemma.representation} && tgtLemma.pos == ${lemma.pos} && tgtLemma.principalParts == ${lemma.principalParts}
+      FOR v,e,p in 1..1 INBOUND tgtLemma._id ${lexicalRelations}
+      FILTER e.isPublic == true && ( e.type == 'canBeInflectionOf' || e.type == 'canNotBeInflectionOf')
+      RETURN { subject: document(e._to), predicate: e.type, object: document(e._from), authorities: [e.createdBy], qualifiers: {} }
   `.toArray();
   return result;
 
 }
 
 const findAllLemmaVariants = (lemma) => {
+  const entities = _getEntities(lemma.lang);
   const result = query`
-    FOR tgtLemma in ${lemmas}
-    FILTER tgtLemma.representation == ${lemma.representation} && tgtLemma.lang == ${lemma.lang} && tgtLemma.pos == ${lemma.pos} && tgtLemma.principalParts == ${lemma.principalParts}
-      FOR v,e,p in 1..1 ANY tgtLemma._id ${lemmaVariants}
-      LET assertions = (
-        FOR v2, e2, p2 in 1..1 INBOUND e._id ${assertsTrue}
-        FILTER e2.isPublic == true
-        RETURN e2
-      )
-      FILTER length(assertions) > 0
-      FOR assertion in assertions
-        RETURN { subject: document(e._to), predicate: 'isLemmaVariant', object: document(e._from), authorities: assertions[*]._from, qualifiers: { prefer: e.prefer } }
+    FOR tgtLemma in ${entities}
+    FILTER tgtLemma.type == 'alpheios:lemma' && tgtLemma.representation == ${lemma.representation} && tgtLemma.pos == ${lemma.pos} && tgtLemma.principalParts == ${lemma.principalParts}
+      FOR v,e,p in 1..1 ANY tgtLemma._id ${lexicalRelations}
+      FILTER e.isPublic == true && e.type == 'isLemmaVariant'
+      RETURN { subject: document(e._to), predicate: 'isLemmaVariant', object: document(e._from), authorities: [e.createdBy], qualifiers: { prefer: e.prefer } }
   `.toArray()
-  return result;
-};
-
-const findSpecificLemmaVariant = (lemma,variantLemma) => {
-  const result = query`
-    FOR tgtLemma IN ${lemmas}
-    FILTER tgtLemma.representation == ${lemma.representation} && tgtLemma.lang == ${lemma.lang} && tgtLemma.pos == ${lemma.pos} && tgtLemma.principalParts == ${lemma.principalParts}
-      FOR v,e,p in 1..1 INBOUND tgtLemma._id ${lemmaVariants}
-      FILTER v.representation == ${variantLemma.representation} && v.lang == ${variantLemma.lang} && v.pos == ${variantLemma.pos} && v.principalParts == ${variantLemma.principalParts}
-      RETURN e
-  `.toArray();
   return result;
 };
 
 module.exports = {
   findLemmasForWord: findLemmasForWord,
-  findSpecificLemmaVariant: findSpecificLemmaVariant,
   findAllLemmaVariants: findAllLemmaVariants,
   findAllInflections: findAllInflections,
   findLemmaNegations: findLemmaNegations,

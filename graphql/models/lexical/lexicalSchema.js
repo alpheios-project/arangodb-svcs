@@ -15,13 +15,12 @@ const lexicalObjectInterface = new gql.GraphQLInterfaceType({
     }
   },
   resolveType(obj) {
-    console.log("RESOLVE",obj);
-    if (obj._id) {
-      if (obj._id.match(/lemmas\//)) {
+    if (obj.type) {
+      if (obj.type == 'alpheios:lemma') {
         return lemmaOutputType;
-      } else if (obj._id.match(/inflections\//)) {
+      } else if (obj.type == 'alpheios:infl') {
         return inflectionOutputType
-      } else if (obj._id.match(/words\//)) {
+      } else if (obj.type == 'alpheios:word') {
         return wordOutputType
       }
     } else if (obj.lemma) {

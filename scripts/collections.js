@@ -1,26 +1,14 @@
 'use strict';
 const documentCollections = [
-  'words',
-  'lemmas',
-  'inflections',
-  'translations',
-  'definitions',
-  'features',
+  'lexicalEntities_lat',
+  'lexicalEntities_grc',
   'users',
   'comments',
   'contexts'
 ];
 
 const edgeCollections = [
-  'hasLemma',
-  'isLemmaVariant',
-  'isSpellingVariant',
-  'hasDefinition',
-  'hasFeature',
-  'isTranslationOf',
-  'canBeInflectionOf',
-  'assertsTrue',
-  'assertsFalse',
+  'lexicalRelations',
   'makesComment',
   'commentsOn',
   'attestedAt'
@@ -35,36 +23,16 @@ const fixturesNodes = {
       iri: 'https://orcid.org/0000-0001-7556-1572'
     }
   ],
-  words: [
-    { _key: 'dicerelat',
+  lexicalEntities_lat: [
+    { _key: 'dicere',
+      type: 'alpheios:word',
       representation: 'dicere',
       lang: 'lat',
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
     },
-    { _key: 'tinosgrc',
-      representation: 'τίνος',
-      lang: 'grc',
-      createdBy: 'alpheios.net' ,
-      createdOn: new Date().toString()
-    },
-    {
-      _key: 'memenealt1',
-      representation: 'μεμνῄμεθα',
-      lang: 'grc',
-      createdBy: 'alpheios.net' ,
-      createdOn: new Date().toString()
-    },
-    {
-      _key: 'memenealt2',
-      representation: 'μεμνήμεθα',
-      lang: 'grc',
-      createdBy: 'alpheios.net' ,
-      createdOn: new Date().toString()
-    }
-  ],
-  lemmas: [
-    { _key: 'whitlatdico1',
+    { _key: 'whitdico1',
+      type: 'alpheios:lemma',
       representation: 'dico',
       lang: 'lat',
       pos: 'VERB',
@@ -73,7 +41,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatdico2',
+    { _key: 'whitdico2',
+      type: 'alpheios:lemma',
       representation: 'dico',
       lang: 'lat',
       pos: 'VERB',
@@ -82,7 +51,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatafore',
+    { _key: 'whitafore',
+      type: 'alpheios:lemma',
       representation: 'afore',
       lang: 'lat',
       pos: 'VERB',
@@ -91,7 +61,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatabsum',
+    { _key: 'whitabsum',
+      type: 'alpheios:lemma',
       representation: 'absum',
       lang: 'lat',
       pos: 'VERB' ,
@@ -100,7 +71,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net' ,
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatvult',
+    { _key: 'whitvult',
+      type: 'alpheios:lemma',
       representation: 'vult',
       lang: 'lat',
       pos: 'VERB',
@@ -109,7 +81,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net',
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatvolo',
+    { _key: 'whitvolo',
+      type: 'alpheios:lemma',
       representation: 'volo',
       lang: 'lat',
       pos: 'VERB',
@@ -118,7 +91,8 @@ const fixturesNodes = {
       createdBy: 'alpheios.net',
       createdOn: new Date().toString()
     },
-    { _key: 'whitlataccurro1',
+    { _key: 'whitaccurro1',
+      type: 'alpheios:lemma',
       representation: 'accurro',
       lang: 'lat',
       pos: 'NOUN',
@@ -127,7 +101,8 @@ const fixturesNodes = {
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     },
-    { _key: 'whitlataccurro2',
+    { _key: 'whitaccurro2',
+      type: 'alpheios:lemma',
       representation: 'volo',
       lang: 'lat',
       pos: 'NOUN',
@@ -136,7 +111,8 @@ const fixturesNodes = {
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     },
-    { _key: 'whitlatsenatus',
+    { _key: 'whitsenatus',
+      type: 'alpheios:lemma',
       representation: 'senatus',
       lang: 'lat',
       pos: 'NOUN',
@@ -145,29 +121,9 @@ const fixturesNodes = {
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     },
-    { _key: 'morphgrctisx',
-      representation: 'τίς',
-      lang: 'grc',
-      pos: 'X',
-      langpos: 'irregular',
-      principalParts: [],
-      source: 'net.alpheios:tools:wordsxml.v1',
-      createdBy: 'CTX_users/net.alpheios',
-      createdOn: new Date().toString()
-    },
-    { _key: 'morphgrctis',
-      representation: 'τίς',
-      lang: 'grc',
-      pos: 'PRON',
-      principalParts: [],
-      source: 'net.alpheios:tools:wordsxml.v1',
-      createdBy: 'CTX_users/net.alpheios',
-      createdOn: new Date().toString()
-    }
-  ],
-  inflections: [
     {
-      _key: 'dicerelatpresinfact',
+      _key: 'dicerepresinfact',
+      type: 'alpheios:infl',
       form: 'dicere',
       stem: 'dic',
       suffix: 'ere',
@@ -178,20 +134,8 @@ const fixturesNodes = {
       }
     },
     {
-      _key: 'tinostisgensing',
-      form: "τίνος",
-      stem: "τίνος",
-      udfeatures: {
-        Case: 'genitive',
-        Number: 'singular',
-      },
-      xfeatures: {
-        stemtype: 'inter',
-        morphtype: 'enclitic indeclform'
-      }
-    },
-    {
-      _key: 'inflatsenatusvoc',
+      _key: 'inflsenatusvoc',
+      type: 'alpheios:infl',
       form: 'senatu',
       stem: 'senat',
       suffix: 'u',
@@ -204,6 +148,143 @@ const fixturesNodes = {
         Declension: '4th',
         Var: '1st'
       },
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    }
+  ],
+  lexicalEntities_grc: [
+    { _key: 'tinos',
+      type: 'alpheios:word',
+      representation: 'τίνος',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'memenealt1',
+      type: 'alpheios:word',
+      representation: 'μεμνῄμεθα',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'memenealt2',
+      type: 'alpheios:word',
+      representation: 'μεμνήμεθα',
+      lang: 'grc',
+      createdBy: 'alpheios.net' ,
+      createdOn: new Date().toString()
+    },
+    { _key: 'morphtisx',
+      type: 'alpheios:lemma',
+      representation: 'τίς',
+      lang: 'grc',
+      pos: 'X',
+      langpos: 'irregular',
+      principalParts: [],
+      source: 'org.perseus:tools:morpheus.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    { _key: 'morphtis',
+      type: 'alpheios:lemma',
+      representation: 'τίς',
+      lang: 'grc',
+      pos: 'PRON',
+      principalParts: [],
+      source: 'org.perseus:tools:morpheus.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'tinostisgensing',
+      type: 'alpheios:infl',
+      form: "τίνος",
+      stem: "τίνος",
+      udfeatures: {
+        Case: 'genitive',
+        Number: 'singular',
+      },
+      xfeatures: {
+        stemtype: 'inter',
+        morphtype: 'enclitic indeclform'
+      }
+    },
+    {
+      _key: 'dhlow',
+      type: 'alpheios:lemma',
+      representation: 'δηλόω',
+      lang: 'grc',
+      pos: 'VERB',
+      principalParts: [],
+      source: 'org.perseus:tools:morpheus.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'dhloiinfl3rdopt',
+      type: 'alpheios:infl',
+      form: 'δηλοῖ',
+      stem: 'δηλ',
+      suffix: 'οῖ',
+      udfeatures: {
+        Mood: 'optative',
+        Number: 'singular',
+        Person: '3rd',
+        Tense: 'present',
+        Voice: 'active',
+      },
+      xfeatures: {
+        stemtype: 'ow_pr',
+        derivtype: 'ow_denom',
+        morph: 'contr'
+      },
+      source: 'org.perseus:tools:morpheus.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'dhloiinfl3rdind',
+      type: 'alpheios:infl',
+      form: 'δηλοῖ',
+      stem: 'δηλ',
+      suffix: 'οῖ',
+      udfeatures: {
+        Mood: 'indicative',
+        Number: 'singular',
+        Person: '3rd',
+        Tense: 'present',
+        Voice: 'active',
+      },
+      xfeatures: {
+        stemtype: 'ow_pr',
+        derivtype: 'ow_denom',
+        morph: 'contr'
+      },
+      source: 'org.perseus:tools:morpheus.v1',
+      createdBy: 'CTX_users/net.alpheios',
+      createdOn: new Date().toString()
+    },
+    {
+      _key: 'dhloiinfl2ndsub',
+      type: 'alpheios:infl',
+      form: 'δηλοῖ',
+      stem: 'δηλ',
+      suffix: 'οῖ',
+      udfeatures: {
+        Mood: 'subjunctive',
+        Number: 'singular',
+        Person: '2nd',
+        Tense: 'active',
+        Voice: 'mediopassive',
+      },
+      xfeatures: {
+        stemtype: 'ow_pr',
+        derivtype: 'ow_denom',
+        morph: 'contr'
+      },
+      source: 'Smyth',
       createdBy: 'CTX_users/net.alpheios',
       createdOn: new Date().toString()
     }
@@ -222,85 +303,130 @@ const fixturesNodes = {
 };
 
 const fixturesEdges = [
-  { cname: 'hasLemma',
+  { cname: 'lexicalRelations',
     data: [
+      { _key: 'dhloinfl3rdindnegate',
+        _to: 'CTX_lexicalEntities_grc/dhlow',
+        _from: 'CTX_lexicalEntities_grc/dhloiinfl3rdind',
+        type: 'canNotBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
+      { _key: 'dhloinfl3rdoptnegate',
+        _to: 'CTX_lexicalEntities_grc/dhlow',
+        _from: 'CTX_lexicalEntities_grc/dhloiinfl3rdopt',
+        type: 'canNotBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
+      { _key: 'dhloiinfl2ndsubdhlow',
+        _to: 'CTX_lexicalEntities_grc/dhlow',
+        _from: 'CTX_lexicalEntities_grc/dhloiinfl2ndsub',
+        type: 'canBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
+        createdBy: 'CTX_users/net.alpheios',
+        createdOn: new Date().toString()
+      },
       { _key: 'diceredico2',
-        _from: 'CTX_words/dicerelat',
-        _to: 'CTX_lemmas/diceredico2',
+        _to: 'CTX_lexicalEntities_lat/dicere',
+        _from: 'CTX_lexicalEntities_lat/diceredico2',
+        type: 'isLemmaOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       {
         _key: 'tinostisx',
-        _from: 'CTX_words/tinosgrc',
-        _to: 'CTX_lemmas/morphgrctisx',
+        _to: 'CTX_lexicalEntities_grc/tinos',
+        _from: 'CTX_lexicalEntities_grc/morphtisx',
+        type: 'isNotLemmaOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       {
         _key: 'tinostis',
-        _from: 'CTX_words/tinosgrc',
-        _to: 'CTX_lemmas/morphgrctis',
+        _to: 'CTX_lexicalEntities_grc/tinos',
+        _from: 'CTX_lexicalEntities_grc/morphtis',
+        type: 'isLemmaOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
-      }
-    ]
-  },
-  { cname: 'canBeInflectionOf',
-    data: [
+      },
       {
-        _key: "dicerelatpresinfactdico2",
-        _from: "CTX_inflections/dicerelatpresinfact",
-        _to: "CTX_lemmas/whitlatdico2",
+        _key: "dicerepresinfactdico2",
+        _from: "CTX_lexicalEntities_lat/dicerepresinfact",
+        _to: "CTX_lexicalEntities_lat/whitdico2",
+        type: 'canBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       {
         _key: 'senatuvocsenatus',
-        _from: 'CTX_inflections/inflatsenatusvoc',
-        _to: 'CTX_lemmas/whitlatsenatus',
+        _from: 'CTX_lexicalEntities_lat/inflsenatusvoc',
+        _to: 'CTX_lexicalEntities_lat/whitsenatus',
+        type: 'canBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       {
         _key: 'tinosgensingtis',
-        _from: 'CTX_inflections/tinostisgensing',
-        _to: 'CTX_lemmas/morphgrctis',
+        _from: 'CTX_lexicalEntities_grc/tinostisgensing',
+        _to: 'CTX_lexicalEntities_grc/morphtis',
+        type: 'canBeInflectionOf',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
-      }
-    ]
-  },
-  { cname: 'isLemmaVariant',
-    data: [
+      },
       { _key: 'aforevarabsum',
-        _from: 'CTX_lemmas/whitlatafore',
-        _to: 'CTX_lemmas/whitlatabsum',
-        prefer: 'CTX_lemmas/whitlatabsum',
+        _from: 'CTX_lexicalEntities_lat/whitafore',
+        _to: 'CTX_lexicalEntities_lat/whitabsum',
+        type: 'isLemmaVariant',
+        isPublic: true,
+        confidence: 1,
+        prefer: 'CTX_lexicalEntities_lat/whitabsum',
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       { _key: 'accurro1varaccurro2',
-        _from: 'CTX_lemmas/whitlataccurro1',
-        _to: 'CTX_lemmas/whitlataccurro2',
+        _from: 'CTX_lexicalEntities_lat/whitaccurro1',
+        _to: 'CTX_lexicalEntities_lat/whitaccurro2',
+        type: 'isLemmaVariant',
+        isPublic: true,
+        confidence: 1,
         prefer: null,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       },
       { _key: 'vultvarvolo',
-        _from: 'CTX_lemmas/whitlatvult',
-        _to: 'CTX_lemmas/whitlatvolo',
-        prefer: 'CTX_lemmas/whitlatvolo',
+        _from: 'CTX_lexicalEntities_lat/whitvult',
+        _to: 'CTX_lexicalEntities_lat/whitvolo',
+        type: 'isLemmaVariant',
+        isPublic: true,
+        confidence: 1,
+        prefer: 'CTX_lexicalEntities_lat/whitvolo',
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
-      }
-    ]
-  },
-  { cname: 'isSpellingVariant',
-    data: [
+      },
       { _key: 'memenealt1varmenalt2',
-        _from: 'CTX_words/memenealt1',
-        _to: 'CTX_words/memenealt2',
+        _from: 'CTX_lexicalEntities_grc/memenealt1',
+        _to: 'CTX_lexicalEntities_grc/memenealt2',
+        type: 'isSpellingVariant',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/net.alpheios',
         createdOn: new Date().toString()
       }
@@ -309,101 +435,34 @@ const fixturesEdges = [
   { cname: 'attestedAt',
     data: [
       {
-        _key: 'disamdiceredicolemma',
-        _from: 'CTX_hasLemma/diceredico2',
+        _key: 'disamdicere',
+        type: 'attestedAt',
+        _from: 'CTX_lexicalEntities_lat/dicere',
         _to: 'CTX_contexts/dicereovidmet1',
+        isPublic: true,
+        confidence: 1,
+        createdBy: 'CTX_users/balmas',
+        createdOn: new Date().toString()
+      },
+      {
+        _key: 'disamdiceredicolemma',
+        _from: 'CTX_lexicalEntities_lat/whitdico2',
+        _to: 'CTX_contexts/dicereovidmet1',
+        type: 'attestedAt',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/balmas',
         createdOn: new Date().toString()
       },
       {
         _key: 'disamdiceredicoinfl',
-        _from: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
+        _from: 'CTX_lexicalEntities_lat/dicerepresinfact',
         _to: 'CTX_contexts/dicereovidmet1',
+        type: 'attestedAt',
+        isPublic: true,
+        confidence: 1,
         createdBy: 'CTX_users/balmas',
         createdOn: new Date().toString()
-      }
-    ]
-  },
-  {
-    cname: 'assertsFalse',
-    data: [
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_hasLemma/tinostisx',
-        degreeOfConfidence: '10',
-        isPublic: true
-      }
-    ]
-  },
-  {
-    cname: 'assertsTrue',
-    data: [
-      { _from: 'CTX_users/balmas',
-        _to: 'CTX_attestedAt/disamdiceredicolemma',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/balmas',
-        _to: 'CTX_attestedAt/disamdiceredicoinfl',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/balmas',
-        _to: 'CTX_hasLemma/diceredico2',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/balmas',
-        _to: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_hasLemma/diceredico2',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_canBeInflectionOf/dicerelatpresinfactdico2',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_hasLemma/tinostis',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_canBeInflectionOf/senatuvocsenatus',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_isLemmaVariant/aforevarabsum',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_isLemmaVariant/vultvarvolo',
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_isLemmaVariant/accurro1varaccurro2',
-        assertion: true,
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_canBeInflectionOf/tinosgensingtis',
-        assertion: true,
-        degreeOfConfidence: '10',
-        isPublic: true
-      },
-      { _from: 'CTX_users/net.alpheios',
-        _to: 'CTX_isSpellingVariant/memenealt1varmenalt2',
-        assertion: true,
-        degreeOfConfidence: '10',
-        isPublic: true
       }
     ]
   }

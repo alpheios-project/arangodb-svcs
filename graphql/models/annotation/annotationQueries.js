@@ -49,16 +49,24 @@ module.exports = {
         wordLexemes = wordAssertions.map((a) => { return { lemma: a.object } });
       }
       for (lexeme of [...lexemes,...wordLexemes]) {
+        let lemmaNegations = query.findLemmaNegations(word,lexeme.lemma);
+        if (lemmaNegations.length > 0) {
+          annotations.push({
+            target: wordAssertions[0].subject,
+            assertions: lemmaNegations
+          })
+        }
         let assertions = query.findAllLemmaVariants(lexeme.lemma);
         let inflections = query.findAllInflections(lexeme.lemma);
-        let lemmaNegations = query.findLemmaNegations(word,lexeme.lemma);
-        assertions.push(...inflections,...lemmaNegations);
-        annotations.push(
-        {
+        assertions.push(...inflections);
+        if (assertions.length > 0) {
+          annotations.push(
+            {
               target: lexeme,
               assertions: assertions
-         }
-       )
+            }
+          )
+        }
      }
      return annotations;
     }
